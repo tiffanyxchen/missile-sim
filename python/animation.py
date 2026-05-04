@@ -1,15 +1,21 @@
 import matplotlib.pyplot as plt
+# plt.rcParams['font.family'] = 'Apple Color Emoji'
 from matplotlib.animation import FuncAnimation
 import numpy as np
 
-def animate_trajectory(RM1, RM2, RT1, RT2, skip=50, save_path=None):
+def animate_trajectory(RM1, RM2, RT1, RT2, T, skip=50, save_path=None):
+    
+    if save_path:
+        max_frames = 400
+        skip = max(1, len(RM1) // max_frames)
 
     RM1 = RM1[::skip]
     RM2 = RM2[::skip]
     RT1 = RT1[::skip]
     RT2 = RT2[::skip]
-
-    fig, ax = plt.subplots(figsize=(10,6))
+    T   =   T[::skip]
+     
+    fig, ax = plt.subplots(figsize=(6,4))
 
     all_x = np.concatenate([RM1, RT1])
     all_y = np.concatenate([RM2, RT2])
@@ -27,46 +33,74 @@ def animate_trajectory(RM1, RM2, RT1, RT2, skip=50, save_path=None):
 
     ax.legend()
     ax.grid()
+    
+    # --- ADD THIS BLOCK ---
+    text = ax.text(
+        0.02, 0.95, '',
+        transform=ax.transAxes,
+        fontsize=12,
+        verticalalignment='top',
+        bbox=dict(facecolor='black', alpha=0.6),
+        color='lime'
+    )
+    # ----------------------
 
     def init():
-        return missile_dot, target_dot, missile_path, target_path, los_line
+        text.set_text('')
+        return missile_dot, target_dot, missile_path, target_path, los_line, text
 
     def update(frame):
-        missile_dot.set_data([RM1[frame]], [RM2[frame]])
-        target_dot.set_data ([RT1[frame]], [RT2[frame]])
+        real_frame = min(frame, frames - 1)
+        
+        missile_dot.set_data([RM1[real_frame]], [RM2[real_frame]])
+        target_dot.set_data ([RT1[real_frame]], [RT2[real_frame]])
 
-        missile_path.set_data(RM1[:frame], RM2[:frame])
-        target_path.set_data (RT1[:frame], RT2[:frame])
+        missile_path.set_data(RM1[:real_frame], RM2[:real_frame])
+        target_path.set_data (RT1[:real_frame], RT2[:real_frame])
 
         los_line.set_data(
-            [RM1[frame], RT1[frame]],
-            [RM2[frame], RT2[frame]]
+            [RM1[real_frame], RT1[real_frame]],
+            [RM2[real_frame], RT2[real_frame]]
         )
 
-        dist = np.hypot(RM1[frame] - RT1[frame],
-                        RM2[frame] - RT2[frame])
+        R = np.hypot(RM1[real_frame] - RT1[real_frame],
+                     RM2[real_frame] - RT2[real_frame])
 
-        ax.set_title("Intercept 💥" if dist < 50 else "Proportional Navigation")
+        text.set_text(
+            f'T = {T[real_frame]:.2f} s\n'
+            f'R = {R:.2f} m'
+        )
+        
+        ax.set_title("Intercept ***" if R < 50 else "Proportional Navigation")
+        
+        if not save_path and frame == frames - 1:
+            ani.event_source.stop()
+            
+        return missile_dot, target_dot, missile_path, target_path, los_line, text
 
-        return missile_dot, target_dot, missile_path, target_path, los_line
 
-    frames = min(len(RM1), len(RT1))
+    frames       = min(len(RM1), len(RT1))
+    pause_frames = 40 if save_path else 0
+    frames_total = frames + pause_frames
+
 
     ani = FuncAnimation(
         fig,
         update,
-        frames=frames,
-        init_func=init,
-        interval=20,
-        blit=True
+        frames      =   frames_total,
+        init_func   =   init,
+        interval    =   400,
+        blit        =   True
     )
 
+
     if save_path:
-        ani.save(save_path, writer="pillow")
+        ani.save(save_path, writer="pillow", fps = 20)
     else:
         plt.show()
 
     return ani
+
 
 
 if __name__ == "__main__":
@@ -76,6 +110,6 @@ if __name__ == "__main__":
                       delimiter=",",
                       skiprows=1)
 
-    RM1, RM2, RT1, RT2 = data[:, :4].T
+    RM1, RM2, RT1, RT2, T = data.T
 
-    animate_trajectory(RM1, RM2, RT1, RT2)
+    animate_trajectory(RM1, RM2, RT1, RT2, T, save_path = "../output/gifs/intercept.gif")
