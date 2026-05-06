@@ -23,8 +23,11 @@ struct Params {
 };
 
 struct Trajectory {
-    std::vector<Vec2> RM, RT;
+    std::vector<Vec2> RM;
+    std::vector<Vec2> RT;
     std::vector<double> T;
+    std::vector<Vec2> VM;
+    std::vector<Vec2> AM;
 };
 
 // ==============================

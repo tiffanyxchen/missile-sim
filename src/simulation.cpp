@@ -89,6 +89,7 @@ Trajectory run_simulation(const Params& p){
         // Target motion w XNT normal to VT so find d/dt(BETA) first, then integrate and update BETA, find VT, new. Integrate for positions.
         double  BETAD   = XNT / spdT;
         BETA    += H    * BETAD;
+
         VT.x     = spdT * cos(BETA);
         VT.y     = spdT * sin(BETA);
         RT.x    += H    * VT.x;
@@ -130,6 +131,8 @@ Trajectory run_simulation(const Params& p){
         traj.RM.push_back(RM);
         traj.RT.push_back(RT);
         traj.T.push_back(T);
+        traj.VM.push_back(VM);
+        traj.AM.push_back(AM);
 
     }
     
@@ -144,14 +147,18 @@ Trajectory run_simulation(const Params& p){
 void save_to_csv(const Trajectory& traj, const std::string& filename) {
     std::ofstream file(filename);
     
-    file << "RM1,RM2,RT1,RT2,T\n";
+    file << "RM1,RM2,RT1,RT2,T,VM1,VM2,AM1,AM2\n";
     
     for (size_t i = 0; i < traj.RM.size(); i++) {
         file << traj.RM[i].x << ","
         << traj.RM[i].y << ","
         << traj.RT[i].x << ","
         << traj.RT[i].y << ","
-        << traj.T[i] << "\n";
+        << traj.T[i]    << ","
+        << traj.VM[i].x << ","
+        << traj.VM[i].y << ","
+        << traj.AM[i].x << ","
+        << traj.AM[i].y << "\n";
     }
     
     file.close();

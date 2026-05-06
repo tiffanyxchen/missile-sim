@@ -6,7 +6,7 @@ import numpy as np
 def animate_trajectory(RM1, RM2, RT1, RT2, T, skip=50, save_path=None):
     
     if save_path:
-        max_frames = 400
+        max_frames = 360
         skip = max(1, len(RM1) // max_frames)
 
     RM1 = RM1[::skip]
@@ -95,9 +95,10 @@ def animate_trajectory(RM1, RM2, RT1, RT2, T, skip=50, save_path=None):
 
 
     if save_path:
-        ani.save(save_path, writer="pillow", fps = 20)
-    else:
-        plt.show()
+        ani.save(save_path, writer="pillow", fps = 30)
+    #else:
+    #    plt.show()
+    plt.show()
 
     return ani
 
@@ -108,7 +109,7 @@ if __name__ == "__main__":
 
     data = np.loadtxt("../output/csv/run_default.csv",
                       delimiter=",",
-                      skiprows=1)
+                      skiprows=1)[:, 0:5]
 
     RM1, RM2, RT1, RT2, T = data.T
 
