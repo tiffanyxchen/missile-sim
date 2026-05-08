@@ -2,6 +2,7 @@
 *.o
 *.out
 main
+src/sim
 
 # Mac junk
 .DS_Store
@@ -12,3 +13,4 @@ __pycache__/
 
 # Large outputs
 output/gifs/
+output/csv/*.csv
