@@ -107,10 +107,10 @@ def animate_trajectory(RM1, RM2, RT1, RT2, T, skip=50, save_path=None):
 if __name__ == "__main__":
     import numpy as np
 
-    data = np.loadtxt("../output/csv/run_default.csv",
+    data = np.loadtxt("output/csv/run_default_xnt_t.csv",
                       delimiter=",",
                       skiprows=1)[:, 0:5]
 
     RM1, RM2, RT1, RT2, T = data.T
 
-    animate_trajectory(RM1, RM2, RT1, RT2, T, save_path = "../output/gifs/intercept.gif")
+    animate_trajectory(RM1, RM2, RT1, RT2, T, save_path = "output/gifs/intercept_xnt_t.gif")
