@@ -6,7 +6,7 @@ visualization.
 
 ## 🎥 Demo
 
-![Simulation](demo.gif)
+![Simulation](demo1.gif)
 
 ## 📂 Project Structure
 
